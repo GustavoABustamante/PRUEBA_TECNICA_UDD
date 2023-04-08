@@ -1,0 +1,21 @@
+version: '3.4'
+
+networks:
+  dev:
+
+services:
+  db_udd:
+    container_name: db_udd
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    ports:
+        - 1433:1433
+    environment:
+        - ACCEPT_EULA=Y
+        - SA_PASSWORD=Admin&123
+    networks:
+        - dev
+  prueba_tecnica_udd:
+    image: ${DOCKER_REGISTRY-}pruebatecnicaudd
+    build:
+      context: .
+      dockerfile: Dockerfile
