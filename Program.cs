@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using PRUEBA_TECNICA_UDD.Data;
+using PRUEBA_TECNICA_UDD.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +16,15 @@ builder.Services.AddDbContext<DbContextClass>(options =>
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+//Mediatr
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
+
+//Automapper
+builder.Services.AddAutoMapper(typeof(Program).Assembly);
+
+//Repositories
+builder.Services.AddScoped<IPersonaRepository, PersonaRepository>();
 
 var app = builder.Build();
 

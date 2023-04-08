@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using PRUEBA_TECNICA_UDD.Commands;
+using PRUEBA_TECNICA_UDD.DTOs;
 using PRUEBA_TECNICA_UDD.Models;
 using PRUEBA_TECNICA_UDD.Repositories;
 
@@ -15,11 +16,10 @@ namespace PRUEBA_TECNICA_UDD.Handlers
         }
         public async Task<Persona> Handle(CreatePersonaCommand command, CancellationToken cancellationToken)
         {
-            var persona = new Persona()
+            var persona = new CreatePersonaDTO()
             {
                 Nombre = command.Nombre,
                 FechaIngreso = command.FechaIngreso,
-                EsFeriadoLegal= command.EsFeriadoLegal,
             };
 
             return await _personaRepository.AddPersonaAsync(persona);

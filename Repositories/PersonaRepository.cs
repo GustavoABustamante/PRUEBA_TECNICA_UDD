@@ -1,5 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using PRUEBA_TECNICA_UDD.Data;
+using PRUEBA_TECNICA_UDD.DTOs;
 using PRUEBA_TECNICA_UDD.Models;
 using System.Text.Json;
 
@@ -8,13 +10,17 @@ namespace PRUEBA_TECNICA_UDD.Repositories
     public class PersonaRepository : IPersonaRepository
     {
         private readonly DbContextClass _dbContext;
+        private readonly IMapper _mapper;
 
-        public PersonaRepository(DbContextClass dbContext)
+        public PersonaRepository(DbContextClass dbContext, IMapper autoMapper)
         {
             _dbContext = dbContext;
+            _mapper = autoMapper;
         }
-        public async Task<Persona> AddPersonaAsync(Persona persona)
+        public async Task<Persona> AddPersonaAsync(CreatePersonaDTO newPersona)
         {
+            var persona = _mapper.Map<Persona>(newPersona);
+
             // Aquí realice la call al endpoint del gobierno para obtener respuesta feriado o no feriedo enviando una fecha en formato 0001/01/01
             using (var client = new HttpClient())
             {
