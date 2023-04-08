@@ -15,6 +15,7 @@ namespace PRUEBA_TECNICA_UDD.Repositories
         }
         public async Task<Persona> AddPersonaAsync(Persona persona)
         {
+            // Aquí realice la call al endpoint del gobierno para obtener respuesta feriado o no feriedo enviando una fecha en formato 0001/01/01
             using (var client = new HttpClient())
             {
                 client.BaseAddress = new Uri("https://apis.digital.gob.cl/fl/feriados/");
