@@ -4,6 +4,17 @@
 Git repo para prueba técnica postulación desarrollador analista UDD.
 
 
+## Tech Stack
+
+**Descripción:** Este repo contiene una Web API estructurada en una representación simple del patrón de desarrollo CQRS. 
+
+**Backend:** .Net Standard 2.0 - [.Net Standards.](https://learn.microsoft.com/es-es/dotnet/standard/net-standard?tabs=net-standard-2-0)
+
+**Libraries:** - EntityFrameworkCore - Swagger - [MediatR](https://github.com/jbogard/MediatR) - [AutoMapper](https://github.com/AutoMapper/AutoMapper) 
+
+**Database:** SQL Server docker image.
+
+
 ## Authors
 
 - [@GustavoBustamante](https://github.com/GustavoABustamante)
