@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json.Linq;
 using PRUEBA_TECNICA_UDD.Data;
 using PRUEBA_TECNICA_UDD.DTOs;
 using PRUEBA_TECNICA_UDD.Models;
+using System.Numerics;
 using System.Text.Json;
 
 namespace PRUEBA_TECNICA_UDD.Repositories
@@ -21,7 +23,7 @@ namespace PRUEBA_TECNICA_UDD.Repositories
         {
             var persona = _mapper.Map<Persona>(newPersona);
 
-            // Aquí realice la call al endpoint del gobierno para obtener respuesta feriado o no feriedo enviando una fecha en formato 0001/01/01
+            // Aquí realice la call al endpoint del gobierno para obtener respuesta feriado o no feriado enviando una fecha en formato 0001/01/01
             using (var client = new HttpClient())
             {
                 client.BaseAddress = new Uri("https://apis.digital.gob.cl/fl/feriados/");
@@ -29,13 +31,22 @@ namespace PRUEBA_TECNICA_UDD.Repositories
                 var response = await client.GetAsync(persona.FechaIngreso.ToString("yyyy/MM/dd"));
                 if (response.IsSuccessStatusCode)
                 {
-                    string strFeriadoLegal = await response.Content.ReadAsStringAsync();
+                    string responseContent = await response.Content.ReadAsStringAsync();
 
-                    var feriadoLegal = JsonSerializer.Deserialize<List<FeriadosCL>>(strFeriadoLegal);
+                    var responseToken = JToken.Parse(responseContent);
 
-                    if (feriadoLegal is not null)
+                    if (responseToken != null)
                     {
-                        persona.EsFeriadoLegal = feriadoLegal[0].irrenunciable == "1" ? true : false;
+                        if (responseToken is JArray)
+                        {
+                            IEnumerable<FeriadosCL> feriados = responseToken.ToObject<List<FeriadosCL>>();
+                            persona.EsFeriadoLegal = feriados.FirstOrDefault().error ? false : true;
+                        }
+                        else if (responseToken is JObject)
+                        {
+                            FeriadosCL feriado = responseToken.ToObject<FeriadosCL>();
+                            persona.EsFeriadoLegal = feriado.error ? false : true;
+                        }
                     }
                 }
             }

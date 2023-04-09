@@ -27,35 +27,43 @@ namespace PRUEBA_TECNICA_UDD.Controllers
         }
 
         [HttpGet("personaId")]
-        public async Task<IActionResult> GetPersonaByIdAsync(int? personaId)
+        public async Task<IActionResult> GetPersonaByIdAsync(int personaId)
         {
-            // Verfificar el valor recibido en la peticion Get 
-            if (!personaId.HasValue || personaId < 0)
+            try
             {
-                return BadRequest("Id persona es requerido.");
+                // Verfificar el valor recibido en la peticion Get 
+                if (int.IsNegative(personaId) || personaId == 0)
+                {
+                    return BadRequest("Id persona no válido.");
+                }
+
+                var persona = await _mediator.Send(new GetPersonaByIdQuery() { Id = personaId });
+
+                if (persona == null)
+                {
+                    return NotFound($"La persona con el Id {personaId} no existe.");
+                }
+
+                return Ok(persona);
             }
-
-            var persona = await _mediator.Send(new GetPersonaByIdQuery() { Id = (int)personaId });
-
-            if (persona is null)
+            catch (Exception e)
             {
-                return NotFound($"La persona con el Id {personaId} no existe.");
+                throw new Exception("Algo salio mal... ", e);
             }
-
-            return Ok(persona);
         }
         [HttpPost]
         public async Task<IActionResult> AddPersonaAsync(CreatePersonaDTO newPersona)
         {
             try
             {
-                if (newPersona is null || string.IsNullOrEmpty(newPersona.Nombre))
+                if (newPersona == null || string.IsNullOrEmpty(newPersona.Nombre))
                 {
                     return BadRequest("Persona no puede estar vacío.");
                 }
 
                 DateTime fechaIngresa;
 
+                // Validar si la fecha es entregada en el formato correcto
                 bool validDate = DateTime.TryParseExact(
                 newPersona.FechaIngreso.ToString("yyyy/MM/dd"),
                 "yyyy/MM/dd",
@@ -63,18 +71,19 @@ namespace PRUEBA_TECNICA_UDD.Controllers
                 DateTimeStyles.None,
                 out fechaIngresa);
 
+                // En caso de fecha no valida retornar BadRequest()
                 if (!validDate) return BadRequest("Fecha no válida.");
 
                 var persona = await _mediator.Send(new CreatePersonaCommand(
                 newPersona.Nombre,
                 newPersona.FechaIngreso));
 
-                return Created($"/personaId?id={persona.Id}", persona);
+                return Created($"/personaId?id={persona.Id}", persona.Id);
 
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                throw;
+                throw new Exception("Algo salio mal... ", e);
             }
         }
         [HttpDelete]
@@ -82,27 +91,28 @@ namespace PRUEBA_TECNICA_UDD.Controllers
         {
             try
             {
-                //Verificar si Persona existe
+                // Verfificar el valor recibido en la peticion Delete
+                if (int.IsNegative(personaId) || personaId == 0)
+                {
+                    return BadRequest("Id persona no válido.");
+                }
+
+                // Verificar si Persona existe
                 var persona = await _mediator.Send(new GetPersonaByIdQuery() { Id = personaId });
 
-                //Si Persona es null retorna 404 NotFound
+                // Si Persona es null retorna 404 NotFound
                 if (persona == null)
                 {
-                    return NotFound();
+                    return NotFound($"La persona con el Id {personaId} no existe.");
                 }
 
-                int rowsDeleted = await _mediator.Send(new DeletePersonaCommand() { Id = personaId });
+                await _mediator.Send(new DeletePersonaCommand() { Id = personaId });
 
-                if (rowsDeleted > 0) return NoContent();
-                else
-                {
-                    // En caso de no borrar el registro
-                    return BadRequest();
-                }
+                return NoContent();
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                throw;
+                throw new Exception("Algo salio mal... ", e);
             }
         }
     }
