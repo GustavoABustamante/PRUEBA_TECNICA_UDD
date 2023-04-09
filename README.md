@@ -66,10 +66,11 @@ Download and install docker desktop
 Go to the projects folder and run
 
 ```bash
-  docker-compose up --build
+  docker-compose up --build -d
 ```
-Or open the solution on Visual Studio
+Access to the Web API from the delivered port
+
 
 ```bash
-  Play docker compose
+  http://localhost:{Port}/swagger
 ```
