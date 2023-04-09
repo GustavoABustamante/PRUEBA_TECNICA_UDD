@@ -66,7 +66,7 @@ Download and install docker desktop
 Go to the projects folder and run
 
 ```bash
-  docker compose build
+  docker-compose up --build
 ```
 Or open the solution on Visual Studio
 
